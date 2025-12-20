@@ -1,4 +1,4 @@
-# Teams Transcript Downloader / Teams トランスクリプトダウンローダー
+# Teams Transcript Downloader
 
 [English](#english) | [日本語](#japanese)
 
