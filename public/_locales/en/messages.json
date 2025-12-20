@@ -1,0 +1,102 @@
+{
+  "extensionName": {
+    "message": "Teams Transcript Downloader",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Download Microsoft Teams recording transcripts (subtitles) as VTT files",
+    "description": "Description of the extension"
+  },
+  "defaultTitle": {
+    "message": "Download transcript",
+    "description": "Default title for the extension icon"
+  },
+  "checkingTranscript": {
+    "message": "Checking for transcript...",
+    "description": "Title shown while checking transcript availability"
+  },
+  "transcriptUnavailable": {
+    "message": "Transcript cannot be downloaded on this page",
+    "description": "Title shown when transcript is not available"
+  },
+  "transcriptUnavailableWithReason": {
+    "message": "Transcript unavailable: $REASON$",
+    "description": "Title shown when transcript is unavailable with a specific reason",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "No transcript found"
+      }
+    }
+  },
+  "notificationTitle": {
+    "message": "Transcript Unavailable",
+    "description": "Title for notification when transcript is unavailable"
+  },
+  "notificationMessage": {
+    "message": "No transcript found",
+    "description": "Default message for notification"
+  },
+  "errorDriveFileId": {
+    "message": "Could not find Drive ID or File ID. Please reload the page and try again.",
+    "description": "Error message when Drive ID or File ID is not found"
+  },
+  "errorMetadata": {
+    "message": "Failed to fetch metadata: $STATUS$",
+    "description": "Error message when metadata fetch fails",
+    "placeholders": {
+      "status": {
+        "content": "$1",
+        "example": "404"
+      }
+    }
+  },
+  "errorNoTranscript": {
+    "message": "No transcript found",
+    "description": "Error message when no transcript exists"
+  },
+  "errorDownloadVtt": {
+    "message": "Failed to download VTT file: $STATUS$",
+    "description": "Error message when VTT download fails",
+    "placeholders": {
+      "status": {
+        "content": "$1",
+        "example": "404"
+      }
+    }
+  },
+  "errorDownloadFailed": {
+    "message": "Download failed",
+    "description": "Generic download failure message"
+  },
+  "errorCommunication": {
+    "message": "Failed to communicate with content script",
+    "description": "Error message when communication with content script fails"
+  },
+  "reasonChecking": {
+    "message": "Checking",
+    "description": "Reason shown while checking availability"
+  },
+  "reasonNoDriveFileId": {
+    "message": "Could not find Drive ID or File ID",
+    "description": "Reason when Drive ID or File ID is not found"
+  },
+  "reasonMetadataFailed": {
+    "message": "Failed to fetch metadata",
+    "description": "Reason when metadata fetch fails"
+  },
+  "reasonUnknown": {
+    "message": "Unknown error",
+    "description": "Unknown error reason"
+  },
+  "reasonError": {
+    "message": "Error: $MESSAGE$",
+    "description": "Error reason with message",
+    "placeholders": {
+      "message": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  }
+}

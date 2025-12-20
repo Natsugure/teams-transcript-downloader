@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Teams Transcript Downloader",
-  "description": "Download Microsoft Teams recording transcripts (subtitles) as VTT files",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "version": "1.0.0",
   "permissions": [
     "activeTab",
@@ -16,7 +17,7 @@
       "48": "icon48.png",
       "128": "icon128.png"
     },
-    "default_title": "Download transcript"
+    "default_title": "__MSG_defaultTitle__"
   },
   "background": {
     "service_worker": "background.js"

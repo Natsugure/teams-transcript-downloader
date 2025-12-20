@@ -48,7 +48,7 @@ function checkAndUpdateTabState(tabId: number, url?: string) {
   const isStreamPage = /^https:\/\/.*\.sharepoint\.com\/.*\/stream\.aspx/.test(url);
 
   if (!isStreamPage) {
-    setTabUnavailable(tabId, 'Transcript cannot be downloaded on this page');
+    setTabUnavailable(tabId, chrome.i18n.getMessage('transcriptUnavailable'));
   } else {
     setTabChecking(tabId);
   }
@@ -66,11 +66,11 @@ function setTabChecking(tabId: number) {
   });
   chrome.action.setTitle({
     tabId,
-    title: 'Checking for transcript...'
+    title: chrome.i18n.getMessage('checkingTranscript')
   });
   tabStates.set(tabId, {
     available: false,
-    reason: 'Checking',
+    reason: chrome.i18n.getMessage('reasonChecking'),
     lastChecked: Date.now()
   });
 }
@@ -87,7 +87,7 @@ function setTabAvailable(tabId: number) {
   });
   chrome.action.setTitle({
     tabId,
-    title: 'Download transcript'
+    title: chrome.i18n.getMessage('defaultTitle')
   });
   tabStates.set(tabId, {
     available: true,
@@ -126,7 +126,9 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     } else {
       setTabUnavailable(
         tabId,
-        `Transcript unavailable: ${message.reason || 'Unknown error'}`
+        chrome.i18n.getMessage('transcriptUnavailableWithReason', [
+          message.reason || chrome.i18n.getMessage('reasonUnknown')
+        ])
       );
     }
   }
@@ -150,8 +152,8 @@ chrome.action.onClicked.addListener(async (tab) => {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icon128-disabled.png',
-        title: 'Transcript Unavailable',
-        message: tabState?.reason || 'No transcript found'
+        title: chrome.i18n.getMessage('notificationTitle'),
+        message: tabState?.reason || chrome.i18n.getMessage('notificationMessage')
       });
     }
     return;
@@ -168,11 +170,11 @@ chrome.action.onClicked.addListener(async (tab) => {
     } else {
       console.error('[Teams Transcript Downloader] Download failed:', response?.error);
       // Update state on error
-      setTabUnavailable(tab.id, response?.error || 'Download failed');
+      setTabUnavailable(tab.id, response?.error || chrome.i18n.getMessage('errorDownloadFailed'));
     }
   } catch (error) {
     console.error('[Teams Transcript Downloader] Message send error:', error);
-    setTabUnavailable(tab.id, 'Failed to communicate with content script');
+    setTabUnavailable(tab.id, chrome.i18n.getMessage('errorCommunication'));
   }
 });
 

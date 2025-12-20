@@ -55,7 +55,7 @@ async function extractTranscript(): Promise<TranscriptResult> {
       console.error('[Teams Transcript Downloader] Failed to extract Drive ID or File ID');
       return {
         success: false,
-        error: 'Could not find Drive ID or File ID. Please reload the page and try again.'
+        error: chrome.i18n.getMessage('errorDriveFileId')
       };
     }
 
@@ -71,7 +71,7 @@ async function extractTranscript(): Promise<TranscriptResult> {
 
     if (!metadataResponse.ok) {
       console.error(`[Teams Transcript Downloader] Failed to fetch metadata: ${metadataResponse.status}`);
-      throw new Error(`Failed to fetch metadata: ${metadataResponse.status}`);
+      throw new Error(chrome.i18n.getMessage('errorMetadata', [metadataResponse.status.toString()]));
     }
 
     const metadataData = await metadataResponse.json();
@@ -79,7 +79,7 @@ async function extractTranscript(): Promise<TranscriptResult> {
 
     if (transcripts.length === 0) {
       console.error('[Teams Transcript Downloader] No transcript found');
-      throw new Error('No transcript found');
+      throw new Error(chrome.i18n.getMessage('errorNoTranscript'));
     }
 
     // Download VTT file with speaker information
@@ -107,7 +107,7 @@ async function extractTranscript(): Promise<TranscriptResult> {
 
     if (!vttResponse.ok) {
       console.error(`[Teams Transcript Downloader] Failed to download VTT file: ${vttResponse.status}`);
-      throw new Error(`Failed to download VTT file: ${vttResponse.status}`);
+      throw new Error(chrome.i18n.getMessage('errorDownloadVtt', [vttResponse.status.toString()]));
     }
 
     // Extract filename from Content-Disposition header
@@ -185,7 +185,7 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (!capturedDriveId || !capturedFileId) {
       return {
         available: false,
-        reason: 'Could not find Drive ID or File ID'
+        reason: chrome.i18n.getMessage('reasonNoDriveFileId')
       };
     }
 
@@ -202,7 +202,7 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (!metadataResponse.ok) {
       return {
         available: false,
-        reason: 'Failed to fetch metadata'
+        reason: chrome.i18n.getMessage('reasonMetadataFailed')
       };
     }
 
@@ -212,7 +212,7 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (transcripts.length === 0) {
       return {
         available: false,
-        reason: 'No transcript found'
+        reason: chrome.i18n.getMessage('errorNoTranscript')
       };
     }
 
@@ -222,7 +222,7 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     console.error('[Teams Transcript Downloader] Availability check error:', error);
     return {
       available: false,
-      reason: `Error: ${(error as Error).message}`
+      reason: chrome.i18n.getMessage('reasonError', [(error as Error).message])
     };
   }
 }

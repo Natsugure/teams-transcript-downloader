@@ -1,0 +1,102 @@
+{
+  "extensionName": {
+    "message": "Teams Transcript Downloader",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Microsoft Teamsの会議トランスクリプト（字幕）をVTTファイルとしてダウンロード",
+    "description": "Description of the extension"
+  },
+  "defaultTitle": {
+    "message": "トランスクリプトをダウンロード",
+    "description": "Default title for the extension icon"
+  },
+  "checkingTranscript": {
+    "message": "トランスクリプトを確認中...",
+    "description": "Title shown while checking transcript availability"
+  },
+  "transcriptUnavailable": {
+    "message": "このページではトランスクリプトをダウンロードできません",
+    "description": "Title shown when transcript is not available"
+  },
+  "transcriptUnavailableWithReason": {
+    "message": "トランスクリプトをダウンロードできません: $REASON$",
+    "description": "Title shown when transcript is unavailable with a specific reason",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "トランスクリプトが見つかりません"
+      }
+    }
+  },
+  "notificationTitle": {
+    "message": "トランスクリプトをダウンロードできません",
+    "description": "Title for notification when transcript is unavailable"
+  },
+  "notificationMessage": {
+    "message": "トランスクリプトが見つかりませんでした",
+    "description": "Default message for notification"
+  },
+  "errorDriveFileId": {
+    "message": "Drive IDまたはFile IDが見つかりません。ページを再読み込みしてから再度お試しください。",
+    "description": "Error message when Drive ID or File ID is not found"
+  },
+  "errorMetadata": {
+    "message": "メタデータの取得に失敗しました: $STATUS$",
+    "description": "Error message when metadata fetch fails",
+    "placeholders": {
+      "status": {
+        "content": "$1",
+        "example": "404"
+      }
+    }
+  },
+  "errorNoTranscript": {
+    "message": "トランスクリプトが見つかりません",
+    "description": "Error message when no transcript exists"
+  },
+  "errorDownloadVtt": {
+    "message": "VTTファイルのダウンロードに失敗しました: $STATUS$",
+    "description": "Error message when VTT download fails",
+    "placeholders": {
+      "status": {
+        "content": "$1",
+        "example": "404"
+      }
+    }
+  },
+  "errorDownloadFailed": {
+    "message": "ダウンロードに失敗しました",
+    "description": "Generic download failure message"
+  },
+  "errorCommunication": {
+    "message": "Content scriptとの通信に失敗しました",
+    "description": "Error message when communication with content script fails"
+  },
+  "reasonChecking": {
+    "message": "確認中",
+    "description": "Reason shown while checking availability"
+  },
+  "reasonNoDriveFileId": {
+    "message": "Drive IDまたはFile IDが見つかりません",
+    "description": "Reason when Drive ID or File ID is not found"
+  },
+  "reasonMetadataFailed": {
+    "message": "メタデータの取得に失敗しました",
+    "description": "Reason when metadata fetch fails"
+  },
+  "reasonUnknown": {
+    "message": "不明なエラー",
+    "description": "Unknown error reason"
+  },
+  "reasonError": {
+    "message": "エラー: $MESSAGE$",
+    "description": "Error reason with message",
+    "placeholders": {
+      "message": {
+        "content": "$1",
+        "example": "ネットワークエラー"
+      }
+    }
+  }
+}
