@@ -1,5 +1,3 @@
-// Teams トランスクリプト取得 Content Script
-
 interface TranscriptResult {
   success: boolean;
   filename?: string;
@@ -13,20 +11,14 @@ interface AvailabilityCheckResult {
 }
 
 async function extractTranscript(): Promise<TranscriptResult> {
-  console.group('=== トランスクリプト取得テスト ===');
-
   try {
-    // ステップ1: fetchをインターセプトしてAPIの情報をキャプチャ
-    console.log('ステップ1: ページからAPI情報を取得中...');
-
     let capturedDriveId = '';
     let capturedFileId = '';
     const capturedSiteUrl = `${window.location.protocol}//${window.location.host}`;
 
-    // originalFetchを最初に保存（インターセプト前）
     const originalFetch = window.fetch.bind(window);
 
-    // 既存のfetchリクエストからキャプチャ
+    // Intercept fetch requests to capture API information
     window.fetch = function(...args: Parameters<typeof fetch>) {
       const url = args[0].toString();
 
@@ -41,10 +33,8 @@ async function extractTranscript(): Promise<TranscriptResult> {
       return originalFetch.apply(this, args);
     };
 
-    // 既存のスクリプトやページ要素からIDを抽出する試み
+    // Extract IDs from DOM if not captured from fetch
     if (!capturedDriveId || !capturedFileId) {
-      console.log('  DOMから検索中...');
-
       const scripts = document.querySelectorAll('script');
       scripts.forEach((script) => {
         const content = script.textContent || '';
@@ -62,21 +52,14 @@ async function extractTranscript(): Promise<TranscriptResult> {
     }
 
     if (!capturedDriveId || !capturedFileId) {
-      console.warn('⚠ Drive IDまたはFile IDが見つかりません');
-      console.log('解決策: ページを再読み込みしてから、このスクリプトをもう一度実行してください');
-      console.groupEnd();
+      console.error('[Teams Transcript Downloader] Failed to extract Drive ID or File ID');
       return {
         success: false,
-        error: 'Drive IDまたはFile IDが見つかりません。ページを再読み込みしてから再度お試しください。'
+        error: 'Could not find Drive ID or File ID. Please reload the page and try again.'
       };
     }
 
-    console.log('✓ Drive ID:', capturedDriveId);
-    console.log('✓ File ID:', capturedFileId);
-
-    // ステップ2: トランスクリプトのメタデータを取得
-    console.log('\nステップ2: トランスクリプトのメタデータを取得中...');
-
+    // Fetch transcript metadata
     const metadataUrl = `${capturedSiteUrl}/_api/v2.1/drives/${capturedDriveId}/items/${capturedFileId}?select=media/transcripts&$expand=media/transcripts`;
 
     const metadataResponse = await originalFetch(metadataUrl, {
@@ -87,40 +70,32 @@ async function extractTranscript(): Promise<TranscriptResult> {
     });
 
     if (!metadataResponse.ok) {
-      throw new Error(`メタデータの取得に失敗: ${metadataResponse.status}`);
+      console.error(`[Teams Transcript Downloader] Failed to fetch metadata: ${metadataResponse.status}`);
+      throw new Error(`Failed to fetch metadata: ${metadataResponse.status}`);
     }
 
     const metadataData = await metadataResponse.json();
     const transcripts = metadataData.media?.transcripts || [];
 
     if (transcripts.length === 0) {
-      throw new Error('トランスクリプトが見つかりませんでした');
+      console.error('[Teams Transcript Downloader] No transcript found');
+      throw new Error('No transcript found');
     }
 
-    console.log(`✓ ${transcripts.length}件のトランスクリプトを発見`);
-
-    // ステップ3: VTTファイルをダウンロード（話者情報付き）
-    console.log('\nステップ3: VTTファイルをダウンロード中...');
-
+    // Download VTT file with speaker information
     const transcript = transcripts[0];
     const originalUrl = transcript.temporaryDownloadUrl;
 
-    // URLを修正:
-    // - /content (クエリパラメータあり/なし) → /streamContent?is=1&applymediaedits=false
-    // - /streamContent?tempauth=... → /streamContent?is=1&applymediaedits=false
+    // Modify URL to get VTT with speaker information:
+    // /content or /streamContent?... → /streamContent?is=1&applymediaedits=false
     let modifiedUrl = originalUrl;
 
-    // /content で終わる、または /content?... の場合
     if (modifiedUrl.includes('/content')) {
       modifiedUrl = modifiedUrl.replace(/\/content(\?.*)?$/, '/streamContent?is=1&applymediaedits=false');
     }
-    // /streamContent?... の場合（クエリパラメータを全て置き換え）
     else if (modifiedUrl.includes('/streamContent?')) {
       modifiedUrl = modifiedUrl.replace(/\/streamContent\?.*$/, '/streamContent?is=1&applymediaedits=false');
     }
-
-    console.log('  元のURL:', originalUrl);
-    console.log('  修正後URL:', modifiedUrl);
 
     const vttResponse = await originalFetch(modifiedUrl, {
       credentials: 'include',
@@ -131,19 +106,28 @@ async function extractTranscript(): Promise<TranscriptResult> {
     });
 
     if (!vttResponse.ok) {
-      throw new Error(`VTTファイルのダウンロードに失敗: ${vttResponse.status}`);
+      console.error(`[Teams Transcript Downloader] Failed to download VTT file: ${vttResponse.status}`);
+      throw new Error(`Failed to download VTT file: ${vttResponse.status}`);
+    }
+
+    // Extract filename from Content-Disposition header
+    let filename = 'transcript.vtt';
+    const contentDisposition = vttResponse.headers.get('Content-Disposition');
+    if (contentDisposition) {
+      // Try to extract filename from Content-Disposition header
+      const filenameStarMatch = contentDisposition.match(/filename\*=utf-8''([^;]+)/i);
+      if (filenameStarMatch && filenameStarMatch[1]) {
+        filename = decodeURIComponent(filenameStarMatch[1]);
+      } else {
+        // Fallback to regular filename parameter
+        const filenameMatch = contentDisposition.match(/filename=["']?([^"';]+)["']?/i);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
     }
 
     const vttContent = await vttResponse.text();
-    console.log('✓ VTTファイルダウンロード成功');
-    console.log(`  ファイルサイズ: ${vttContent.length}文字`);
-    console.log('  最初の200文字:', vttContent.substring(0, 200));
-
-    // ステップ4: そのままファイルとしてダウンロード
-    console.log('\nステップ4: ファイルをダウンロード中...');
-
-    const timestamp = new Date().toISOString().slice(0, 10);
-    const filename = `teams-transcript-${timestamp}.vtt`;
 
     const blob = new Blob([vttContent], { type: 'text/vtt;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -155,13 +139,10 @@ async function extractTranscript(): Promise<TranscriptResult> {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    console.log(`✓ ダウンロード完了: ${filename}`);
-
-    console.log('\n✓✓✓ すべてのステップが成功しました！ ✓✓✓');
-    console.groupEnd();
-
-    // fetchのインターセプトを解除
+    // Restore original fetch
     window.fetch = originalFetch;
+
+    console.log(`[Teams Transcript Downloader] Successfully downloaded: ${filename} (${vttContent.length} characters)`);
 
     return {
       success: true,
@@ -170,10 +151,7 @@ async function extractTranscript(): Promise<TranscriptResult> {
     };
 
   } catch (error) {
-    console.error('❌ エラーが発生しました:', error);
-    console.error('  メッセージ:', (error as Error).message);
-    console.groupEnd();
-
+    console.error('[Teams Transcript Downloader] Error:', error);
     return {
       success: false,
       error: (error as Error).message
@@ -181,14 +159,14 @@ async function extractTranscript(): Promise<TranscriptResult> {
   }
 }
 
-// トランスクリプトが利用可能かチェックする関数
+// Check if transcript is available
 async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
   try {
     let capturedDriveId = '';
     let capturedFileId = '';
     const capturedSiteUrl = `${window.location.protocol}//${window.location.host}`;
 
-    // DOMからIDを抽出
+    // Extract IDs from DOM
     const scripts = document.querySelectorAll('script');
     scripts.forEach((script) => {
       const content = script.textContent || '';
@@ -207,11 +185,11 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (!capturedDriveId || !capturedFileId) {
       return {
         available: false,
-        reason: 'Drive IDまたはFile IDが見つかりません'
+        reason: 'Could not find Drive ID or File ID'
       };
     }
 
-    // メタデータを取得してトランスクリプトの有無を確認
+    // Check if transcript metadata exists
     const metadataUrl = `${capturedSiteUrl}/_api/v2.1/drives/${capturedDriveId}/items/${capturedFileId}?select=media/transcripts&$expand=media/transcripts`;
 
     const metadataResponse = await fetch(metadataUrl, {
@@ -224,7 +202,7 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (!metadataResponse.ok) {
       return {
         available: false,
-        reason: 'メタデータの取得に失敗しました'
+        reason: 'Failed to fetch metadata'
       };
     }
 
@@ -234,48 +212,47 @@ async function checkTranscriptAvailability(): Promise<AvailabilityCheckResult> {
     if (transcripts.length === 0) {
       return {
         available: false,
-        reason: 'トランスクリプトが見つかりません'
+        reason: 'No transcript found'
       };
     }
 
     return { available: true };
 
   } catch (error) {
+    console.error('[Teams Transcript Downloader] Availability check error:', error);
     return {
       available: false,
-      reason: `エラー: ${(error as Error).message}`
+      reason: `Error: ${(error as Error).message}`
     };
   }
 }
 
-// ページロード時にトランスクリプトの可用性をチェック
+// Check transcript availability on page load
 (async function checkOnLoad() {
-  // ページが完全に読み込まれるまで少し待つ
+  // Wait for page to fully load
   await new Promise(resolve => setTimeout(resolve, 2000));
 
   const result = await checkTranscriptAvailability();
 
-  // background scriptに結果を送信
+  // Send result to background script
   chrome.runtime.sendMessage({
     action: 'updateAvailability',
     available: result.available,
     reason: result.reason
   });
-
-  console.log('トランスクリプト可用性チェック:', result);
 })();
 
-// background scriptからのメッセージを受信
+// Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if (request.action === 'downloadTranscript') {
     extractTranscript().then(result => {
       sendResponse(result);
     });
-    return true; // 非同期レスポンスを示す
+    return true; // Indicates async response
   } else if (request.action === 'checkAvailability') {
     checkTranscriptAvailability().then(result => {
       sendResponse(result);
     });
-    return true; // 非同期レスポンスを示す
+    return true; // Indicates async response
   }
 });

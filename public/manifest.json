@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Teams Transcript Downloader",
-  "description": "Microsoft Teamsのトランスクリプト（字幕）をVTTファイルとしてダウンロードできる拡張機能",
+  "description": "Download Microsoft Teams recording transcripts (subtitles) as VTT files",
   "version": "1.0.0",
   "permissions": [
     "activeTab",
@@ -16,7 +16,7 @@
       "48": "icon48.png",
       "128": "icon128.png"
     },
-    "default_title": "トランスクリプトをダウンロード"
+    "default_title": "Download transcript"
   },
   "background": {
     "service_worker": "background.js"
