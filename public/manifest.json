@@ -5,8 +5,7 @@
   "default_locale": "en",
   "version": "1.0.0",
   "permissions": [
-    "activeTab",
-    "scripting"
+    "activeTab"
   ],
   "host_permissions": [
     "https://*.sharepoint.com/*"
