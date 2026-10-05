@@ -12,11 +12,11 @@
   ],
   "action": {
     "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png",
-      "128": "icon128.png"
+      "16": "icon16-disabled.png",
+      "48": "icon48-disabled.png",
+      "128": "icon128-disabled.png"
     },
-    "default_title": "__MSG_defaultTitle__"
+    "default_title": "__MSG_transcriptUnavailable__"
   },
   "background": {
     "service_worker": "background.js"
