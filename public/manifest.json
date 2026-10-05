@@ -3,7 +3,7 @@
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "permissions": [
     "activeTab"
   ],
@@ -12,19 +12,23 @@
   ],
   "action": {
     "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png",
-      "128": "icon128.png"
+      "16": "icon16-disabled.png",
+      "48": "icon48-disabled.png",
+      "128": "icon128-disabled.png"
     },
-    "default_title": "__MSG_defaultTitle__"
+    "default_title": "__MSG_transcriptUnavailable__"
   },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.sharepoint.com/*/stream.aspx*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://*.sharepoint.com/*/stream.aspx*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ],

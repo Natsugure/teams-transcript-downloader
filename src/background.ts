@@ -36,7 +36,9 @@ chrome.tabs.onActivated.addListener(() => {
 
 
 function checkAndUpdateTabState(tabId: number, url?: string) {
+  // URL is undefined for hosts outside host_permissions (no "tabs" permission)
   if (!url) {
+    setTabUnavailable(tabId, chrome.i18n.getMessage('transcriptUnavailable'));
     return;
   }
 
