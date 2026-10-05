@@ -3,7 +3,7 @@
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "permissions": [
     "activeTab"
   ],
@@ -23,8 +23,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.sharepoint.com/*/stream.aspx*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://*.sharepoint.com/*/stream.aspx*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ],
